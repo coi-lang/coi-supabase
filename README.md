@@ -1,5 +1,5 @@
 <div align="center">
-	<img src="images/logo.png" alt="lib-supabase Logo" width="265"/>
+	<img src="images/logo.png" alt="lib-supabase Logo" width="360"/>
 
 # lib-supabase
 
