@@ -1,0 +1,29 @@
+// supabase - Coi library for Supabase integration
+//
+// A type-safe client library for Supabase backend services.
+// Import this file to access all exported components:
+//
+//   import "supabase/Lib.coi";
+//
+// Usage:
+//   Supabase::Credentials credentials = Supabase::Credentials(SUPABASE_URL, SUPABASE_KEY);
+//
+//   // Database queries
+//   mut Supabase::Database db = Supabase::Database(credentials);
+//   db.selectFrom("users", "*", 10);
+//
+//   // Authentication
+//   mut Supabase::Auth auth = Supabase::Auth(credentials);
+//   auth.signIn("email@example.com", "password");
+//
+//   // Storage
+//   mut Supabase::StorageClient storage = Supabase::StorageClient(credentials);
+//   string url = storage.publicUrl("avatars", "profile.png");
+
+module Supabase;
+
+// API modules
+pub import "src/api/Credentials.coi";
+pub import "src/api/Auth.coi";
+pub import "src/api/Database.coi";
+pub import "src/api/Storage.coi";

@@ -1,0 +1,235 @@
+module Supabase;
+
+// =========================================================
+// Auth - Supabase Authentication
+// =========================================================
+// Handles user sign-up, sign-in, and session management
+//
+// Usage:
+//   Credentials credentials = Credentials("https://xxx.supabase.co", "publishable-key");
+//   mut Auth auth = Auth(credentials);
+//   auth.signUp("email@example.com", "password", &onSuccess, &onError);
+//   auth.signIn("email@example.com", "password", &onSuccess, &onError);
+
+// User session data
+pub pod Session {
+    string accessToken;
+    string refreshToken;
+    string tokenType;
+    int expiresIn;
+}
+
+// User profile data
+pub pod User {
+    string id;
+    string email;
+    string role;
+    string createdAt;
+}
+
+// Auth response structure
+pub pod AuthResponse {
+    bool success;
+    string accessToken;
+    string userId;
+    string email;
+    string error;
+}
+
+pub component Auth(
+    Credentials credentials
+) {
+    mut string baseUrl = credentials.url;
+    mut string apiKey = credentials.publishableKey;
+
+    pub mut bool loading = false;
+    pub mut bool authenticated = false;
+    pub mut string accessToken = "";
+    pub mut string userId = "";
+    pub mut string userEmail = "";
+    pub mut string lastError = "";
+    pub mut string lastResponse = "";
+
+    pub def configure(string newSupabaseUrl, string newPublishableKey) : void {
+        baseUrl = newSupabaseUrl;
+        apiKey = newPublishableKey;
+        loading = false;
+        lastError = "";
+        lastResponse = "";
+        authenticated = false;
+        accessToken = "";
+        userId = "";
+        userEmail = "";
+    }
+
+    pub def configureCredentials(Credentials credentials) : void {
+        configure(credentials.url, credentials.publishableKey);
+    }
+
+    pub def setPublishableKey(string newPublishableKey) : void {
+        apiKey = newPublishableKey;
+    }
+
+    def hasErrorPayload(string response) : bool {
+        return response.contains("\"error\"")
+            || response.contains("\"error_description\"")
+            || response.contains("\"code\"")
+            || response.contains("\"message\"");
+    }
+
+    def withApiKey(string url) : string {
+        if (apiKey.isEmpty()) {
+            return url;
+        }
+        if (url.contains("?")) {
+            return "${url}&apikey=${apiKey}";
+        }
+        return "${url}?apikey=${apiKey}";
+    }
+
+    // Sign up with email and password
+    pub def signUp(
+        string email,
+        string password
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = withApiKey("${baseUrl}/auth/v1/signup");
+        string body = `{"email": "${email}", "password": "${password}"}`;
+
+        FetchRequest.post(url, body, &onSignUpSuccess, &onSignUpError);
+    }
+
+    def onSignUpSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            authenticated = false;
+            System.error("Sign up returned error payload");
+            return;
+        }
+        lastError = "";
+        // Parse response and update state
+        // Response contains: access_token, user.id, user.email
+        System.log("Sign up successful");
+    }
+
+    def onSignUpError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        authenticated = false;
+        System.error("Sign up failed: ${error}");
+    }
+
+    // Sign in with email and password
+    pub def signIn(
+        string email,
+        string password
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = withApiKey("${baseUrl}/auth/v1/token?grant_type=password");
+        string body = `{"email": "${email}", "password": "${password}"}`;
+
+        FetchRequest.post(url, body, &onSignInSuccess, &onSignInError);
+    }
+
+    def onSignInSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            authenticated = false;
+            System.error("Sign in returned error payload");
+            return;
+        }
+        authenticated = true;
+        lastError = "";
+        // Parse response for access_token, user data
+        System.log("Sign in successful");
+    }
+
+    def onSignInError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        authenticated = false;
+        System.error("Sign in failed: ${error}");
+    }
+
+    // Sign out the current user
+    pub def signOut() : void {
+        authenticated = false;
+        accessToken = "";
+        userId = "";
+        userEmail = "";
+        lastResponse = "";
+        System.log("Signed out");
+    }
+
+    pub def signInWithOAuth(string provider, string redirectTo) : void {
+        if (redirectTo.isEmpty()) {
+            string url = withApiKey("${baseUrl}/auth/v1/authorize?provider=${provider}");
+            System.openUrl(url);
+            return;
+        }
+
+        string url = withApiKey("${baseUrl}/auth/v1/authorize?provider=${provider}&redirect_to=${redirectTo}");
+        System.openUrl(url);
+    }
+
+    pub def signInWithPassword(string email, string password) : void {
+        signIn(email, password);
+    }
+
+    // Request password reset
+    pub def resetPassword(
+        string email
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+        string url = withApiKey("${baseUrl}/auth/v1/recover");
+        string body = `{"email": "${email}"}`;
+
+        FetchRequest.post(url, body, &onResetSuccess, &onResetError);
+    }
+
+    def onResetSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("Reset password returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("Password reset email sent");
+    }
+
+    def onResetError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+    }
+
+    // Check if user has valid session
+    pub def isAuthenticated() : bool {
+        return authenticated;
+    }
+
+    // Get current access token
+    pub def getAccessToken() : string {
+        return accessToken;
+    }
+
+    pub def getPublishableKey() : string {
+        return apiKey;
+    }
+}

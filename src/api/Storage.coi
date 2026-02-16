@@ -1,0 +1,202 @@
+module Supabase;
+
+// =========================================================
+// Storage - Supabase Storage API
+// =========================================================
+// File storage operations for uploading, downloading, and
+// managing files in Supabase Storage buckets.
+//
+// Usage:
+//   Credentials credentials = Credentials("https://xxx.supabase.co", "publishable-key");
+//   mut StorageClient storage = StorageClient(credentials);
+//   storage.from("avatars");
+//   string url = storage.getPublicUrl("user-123.png");
+
+pub component StorageClient(
+    Credentials credentials
+) {
+    mut string baseUrl = credentials.url;
+    mut string apiKey = credentials.publishableKey;
+
+    pub mut bool loading = false;
+    pub mut string lastError = "";
+    pub mut string lastResponse = "";
+    mut string currentBucket = "";
+
+    pub def configure(string newSupabaseUrl, string newPublishableKey) : void {
+        baseUrl = newSupabaseUrl;
+        apiKey = newPublishableKey;
+        loading = false;
+        lastError = "";
+        lastResponse = "";
+        currentBucket = "";
+    }
+
+    pub def configureCredentials(Credentials credentials) : void {
+        configure(credentials.url, credentials.publishableKey);
+    }
+
+    def hasErrorPayload(string response) : bool {
+        return response.contains("\"error\"")
+            || response.contains("\"code\"")
+            || response.contains("\"message\"");
+    }
+
+    // Set the bucket to operate on
+    pub def from(string bucket) : void {
+        currentBucket = bucket;
+    }
+
+    // Get public URL for a file
+    pub def getPublicUrl(string path) : string {
+        return "${baseUrl}/storage/v1/object/public/${currentBucket}/${path}";
+    }
+
+    pub def publicUrl(string bucket, string path) : string {
+        from(bucket);
+        return getPublicUrl(path);
+    }
+
+    // Download a file
+    pub def download(
+        string path
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = "${baseUrl}/storage/v1/object/${currentBucket}/${path}";
+        FetchRequest.get(url, &onDownloadSuccess, &onDownloadError);
+    }
+
+    def onDownloadSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("Download returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("Download successful");
+    }
+
+    def onDownloadError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        System.error("Download failed: ${error}");
+    }
+
+    // List files in a bucket path
+    pub def list(
+        string path
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = "${baseUrl}/storage/v1/object/list/${currentBucket}";
+        string body = `{"prefix": "${path}"}`;
+        FetchRequest.post(url, body, &onListSuccess, &onListError);
+    }
+
+    pub def listFrom(string bucket, string path) : void {
+        from(bucket);
+        list(path);
+    }
+
+    def onListSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("List returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("List successful");
+    }
+
+    def onListError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        System.error("List failed: ${error}");
+    }
+
+    // Remove a file
+    pub def remove(
+        string path
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = "${baseUrl}/storage/v1/object/${currentBucket}";
+        string body = `{"prefixes": ["${path}"]}`;
+        FetchRequest.post(url, body, &onRemoveSuccess, &onRemoveError);
+    }
+
+    pub def removeFrom(string bucket, string path) : void {
+        from(bucket);
+        remove(path);
+    }
+
+    def onRemoveSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("Remove returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("Remove successful");
+    }
+
+    def onRemoveError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        System.error("Remove failed: ${error}");
+    }
+
+    // Create a signed URL for temporary access
+    pub def createSignedUrl(
+        string path,
+        int expiresIn
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = "${baseUrl}/storage/v1/object/sign/${currentBucket}/${path}";
+        string body = `{"expiresIn": ${expiresIn}}`;
+        FetchRequest.post(url, body, &onSignedUrlSuccess, &onSignedUrlError);
+    }
+
+    pub def createSignedUrlFrom(string bucket, string path, int expiresIn) : void {
+        from(bucket);
+        createSignedUrl(path, expiresIn);
+    }
+
+    def onSignedUrlSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("Signed URL returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("Signed URL created");
+    }
+
+    def onSignedUrlError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        System.error("Signed URL creation failed: ${error}");
+    }
+}

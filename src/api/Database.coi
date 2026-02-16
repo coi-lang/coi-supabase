@@ -1,0 +1,297 @@
+module Supabase;
+
+// =========================================================
+// Database - Supabase Database Query Builder
+// =========================================================
+// Provides a fluent interface for querying Supabase tables
+// using the PostgREST API.
+//
+// Usage:
+//   Credentials credentials = Credentials("https://xxx.supabase.co", "publishable-key");
+//   mut Database db = Database(credentials);
+//   db.from("users");
+//   db.eq("id", "123");
+//   db.select("*", &onData, &onError);
+
+// Query response structure
+pub pod QueryResponse {
+    bool success;
+    string data;
+    string error;
+    int count;
+}
+
+pub component Database(
+    Credentials credentials
+) {
+    mut string baseUrl = credentials.url;
+    mut string apiKey = credentials.publishableKey;
+
+    pub mut bool loading = false;
+    pub mut string lastError = "";
+    pub mut string lastResponse = "";
+    mut string currentTable = "";
+    mut string queryParams = "";
+
+    pub def configure(string newSupabaseUrl, string newPublishableKey) : void {
+        baseUrl = newSupabaseUrl;
+        apiKey = newPublishableKey;
+        loading = false;
+        lastError = "";
+        lastResponse = "";
+        currentTable = "";
+        queryParams = "";
+    }
+
+    pub def configureCredentials(Credentials credentials) : void {
+        configure(credentials.url, credentials.publishableKey);
+    }
+
+    pub def resetQuery() : void {
+        queryParams = "";
+    }
+
+    def hasErrorPayload(string response) : bool {
+        return response.contains("\"error\"")
+            || response.contains("\"code\"")
+            || response.contains("\"message\"");
+    }
+
+    // Set the table to query
+    pub def from(string table) : void {
+        currentTable = table;
+        queryParams = "";
+    }
+
+    // SELECT - Fetch rows from table
+    pub def select(
+        string columns
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = "${baseUrl}/rest/v1/${currentTable}?select=${columns}${queryParams}";
+        FetchRequest.get(url, &onSelectSuccess, &onSelectError);
+    }
+
+    pub def selectFrom(string table, string columns, int count) : void {
+        from(table);
+        if (count > 0) {
+            limit(count);
+        }
+        select(columns);
+    }
+
+    def onSelectSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("Select returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("Select successful");
+    }
+
+    def onSelectError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        System.error("Select failed: ${error}");
+    }
+
+    // INSERT - Add new row(s)
+    pub def insert(
+        string jsonData
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = "${baseUrl}/rest/v1/${currentTable}";
+        FetchRequest.post(url, jsonData, &onInsertSuccess, &onInsertError);
+    }
+
+    pub def insertInto(string table, string jsonData) : void {
+        from(table);
+        insert(jsonData);
+    }
+
+    def onInsertSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("Insert returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("Insert successful");
+    }
+
+    def onInsertError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        System.error("Insert failed: ${error}");
+    }
+
+    // UPDATE - Modify existing row(s)
+    // Note: Use eq() to filter which rows to update
+    pub def update(
+        string jsonData
+    ) : void {
+        loading = true;
+        lastError = "";
+        lastResponse = "";
+
+        string url = "${baseUrl}/rest/v1/${currentTable}?${queryParams}";
+        FetchRequest.post(url, jsonData, &onUpdateSuccess, &onUpdateError);
+    }
+
+    pub def updateWhereEq(string table, string column, string value, string jsonData) : void {
+        from(table);
+        eq(column, value);
+        update(jsonData);
+    }
+
+    def onUpdateSuccess(string response) : void {
+        loading = false;
+        lastResponse = response;
+        if (hasErrorPayload(response)) {
+            lastError = response;
+            System.error("Update returned error payload");
+            return;
+        }
+        lastError = "";
+        System.log("Update successful");
+    }
+
+    def onUpdateError(string error) : void {
+        loading = false;
+        lastError = error;
+        lastResponse = error;
+        System.error("Update failed: ${error}");
+    }
+
+    // Filter: equals
+    pub def eq(string column, string value) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=eq.${value}";
+        } else {
+            queryParams = "${column}=eq.${value}";
+        }
+    }
+
+    // Filter: not equals
+    pub def neq(string column, string value) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=neq.${value}";
+        } else {
+            queryParams = "${column}=neq.${value}";
+        }
+    }
+
+    // Filter: greater than
+    pub def gt(string column, string value) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=gt.${value}";
+        } else {
+            queryParams = "${column}=gt.${value}";
+        }
+    }
+
+    // Filter: less than
+    pub def lt(string column, string value) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=lt.${value}";
+        } else {
+            queryParams = "${column}=lt.${value}";
+        }
+    }
+
+    // Filter: greater than or equal
+    pub def gte(string column, string value) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=gte.${value}";
+        } else {
+            queryParams = "${column}=gte.${value}";
+        }
+    }
+
+    // Filter: less than or equal
+    pub def lte(string column, string value) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=lte.${value}";
+        } else {
+            queryParams = "${column}=lte.${value}";
+        }
+    }
+
+    // Filter: pattern match (LIKE)
+    pub def like(string column, string pattern) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=like.${pattern}";
+        } else {
+            queryParams = "${column}=like.${pattern}";
+        }
+    }
+
+    // Filter: case-insensitive pattern match (ILIKE)
+    pub def ilike(string column, string pattern) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=ilike.${pattern}";
+        } else {
+            queryParams = "${column}=ilike.${pattern}";
+        }
+    }
+
+    // Filter: value in list
+    pub def inList(string column, string values) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&${column}=in.(${values})";
+        } else {
+            queryParams = "${column}=in.(${values})";
+        }
+    }
+
+    // Order results
+    pub def order(string column, bool ascending) : void {
+        mut string dir = "asc";
+        if (!ascending) {
+            dir = "desc";
+        }
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&order=${column}.${dir}";
+        } else {
+            queryParams = "order=${column}.${dir}";
+        }
+    }
+
+    // Limit number of results
+    pub def limit(int count) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&limit=${count}";
+        } else {
+            queryParams = "limit=${count}";
+        }
+    }
+
+    // Offset results (for pagination)
+    pub def offset(int start) : void {
+        if (queryParams.length() > 0) {
+            queryParams = "${queryParams}&offset=${start}";
+        } else {
+            queryParams = "offset=${start}";
+        }
+    }
+
+    // Get single row
+    pub def single(
+    ) : void {
+        queryParams = "${queryParams}&limit=1";
+        select("*");
+    }
+}
