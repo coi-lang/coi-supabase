@@ -1,7 +1,7 @@
 <div align="center">
-	<img src="images/logo.svg" alt="lib-supabase Logo" width="360"/>
+	<img src="images/logo.svg" alt="pkg-supabase Logo" width="360"/>
 
-# lib-supabase
+# pkg-supabase
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
