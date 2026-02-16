@@ -110,9 +110,23 @@ mut Supabase::Database db = Supabase::Database(creds);
 
 ### Typical query flow
 
+Simple one-liner style:
+
+```coi
+db.selectFrom("users", "*", 1);
+
+if (!db.lastError.isEmpty()) {
+	System.error(db.lastError);
+} else {
+	System.log(db.lastResponse);
+}
+```
+
+Builder style (when you need multiple filters/modifiers):
+
 ```coi
 db.from("users");
-db.eq("id", "123");
+db.limit(1);
 db.select("*");
 
 if (!db.lastError.isEmpty()) {
