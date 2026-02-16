@@ -1,9 +1,9 @@
-// supabase - Coi library for Supabase integration
+// supabase - Coi package for Supabase integration
 //
-// A type-safe client library for Supabase backend services.
-// Import this file to access all exported components:
+// A type-safe client package for Supabase backend services.
+// Import this package to access all exported components:
 //
-//   import "supabase/Lib.coi";
+//   import "@supabase";
 //
 // Usage:
 //   Supabase::Credentials credentials = Supabase::Credentials(SUPABASE_URL, SUPABASE_KEY);

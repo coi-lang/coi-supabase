@@ -1,0 +1,19 @@
+{
+  "$schema": "../schema/package.schema.json",
+  "name": "supabase",
+  "schema-version": 1,
+  "repository": "https://github.com/coi-lang/lib-supabase",
+  "description": "Supabase client package for Coi.",
+  "keywords": ["supabase", "auth", "database", "storage"],
+  "releases": [
+    {
+      "version": "0.1.0",
+      "compiler-drop": {
+        "min": 350,
+        "tested-on": 350
+      },
+      "releasedAt": "2026-02-16"
+    }
+  ],
+  "createdAt": "2026-02-16"
+}

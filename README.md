@@ -6,11 +6,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-Client library for [Supabase](https://supabase.com/) in [Coi](https://github.com/io-eric/coi).
+Client package for [Supabase](https://supabase.com/) in [Coi](https://github.com/io-eric/coi).
 
 </div>
 
-This library gives you:
+This package gives you:
 
 - `Supabase::Credentials` for shared project configuration
 - `Supabase::Auth` for sign-in, sign-up, OAuth, and password reset
@@ -19,18 +19,23 @@ This library gives you:
 
 ## Install
 
-I recommend adding this library to `lib/supabase` inside your project folder.
+Copy this package to `.coi/pkgs/supabase` in your project:
 
-Then, from your `App.coi` (for example), import it like this:
+```bash
+mkdir -p .coi/pkgs
+cp -r /path/to/lib-supabase .coi/pkgs/supabase
+```
+
+Then import it:
 
 ```coi
-import "../lib/supabase/Lib.coi";
+import "@supabase";
 ```
 
 ## Quick Start
 
 ```coi
-import "../lib/supabase/Lib.coi";
+import "@supabase";
 
 module App;
 
