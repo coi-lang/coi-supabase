@@ -28,13 +28,13 @@ coi add supabase
 Then import it:
 
 ```coi
-import "@supabase";
+import "@coi/supabase";
 ```
 
 ## Quick Start
 
 ```coi
-import "@supabase";
+import "@coi/supabase";
 
 module App;
 
