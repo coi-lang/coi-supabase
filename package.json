@@ -1,6 +1,6 @@
 {
-  "$schema": "../schema/package.schema.json",
-  "name": "supabase",
+  "$schema": "https://raw.githubusercontent.com/coi-lang/registry/main/schema/package.schema.json",
+  "name": "coi/supabase",
   "schema-version": 1,
   "repository": "https://github.com/coi-lang/coi-supabase",
   "description": "Supabase client package for Coi.",
@@ -11,6 +11,10 @@
       "compiler": {
         "pond": 0,
         "min-drop": 350
+      },
+      "source": {
+        "commit": "9accf4a2af32134fbadbe7d924577e018697d298",
+        "sha256": "8fde3f16957b376c7ca6d92126cea682d00c38fdd69f3189711dd163ff714c69"
       },
       "releasedAt": "2026-02-16"
     }
