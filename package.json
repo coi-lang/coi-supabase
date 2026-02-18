@@ -10,7 +10,7 @@
       "version": "0.1.0",
       "compiler": {
         "pond": 0,
-        "min-drop": 362
+        "min-drop": 363
       },
       "source": {
         "commit": "a9f9a5b77006dbfbd30fe7227f87098b1e36250f",
