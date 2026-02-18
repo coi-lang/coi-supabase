@@ -1,5 +1,7 @@
 module Supabase;
 
+import "Credentials.coi";
+
 // =========================================================
 // Database - Supabase Database Query Builder
 // =========================================================
