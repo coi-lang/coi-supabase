@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-Client package for [Supabase](https://supabase.com/) in [Coi](https://github.com/io-eric/coi).
+Client package for [Supabase](https://supabase.com/) in [Coi](https://github.com/coi/coi).
 
 </div>
 
