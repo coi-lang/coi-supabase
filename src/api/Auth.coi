@@ -186,10 +186,6 @@ pub component Auth(
         System.openUrl(url);
     }
 
-    pub def signInWithPassword(string email, string password) : void {
-        signIn(email, password);
-    }
-
     // Request password reset
     pub def resetPassword(
         string email
