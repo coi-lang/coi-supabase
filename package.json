@@ -5,19 +5,17 @@
   "repository": "https://github.com/coi/coi-supabase",
   "description": "Supabase client package for Coi.",
   "keywords": ["supabase", "auth", "database", "storage"],
-  "releases": [
-    {
-      "version": "0.1.0",
-      "compiler": {
-        "pond": 0,
-        "min-drop": 380
-      },
-      "source": {
-        "commit": "597fd6935d756b0eb372cc38790ddf3584489ce0",
-        "sha256": "0050fde3b0656ccb75b797218cc4657d6f45fb7b34772ccd567a70dff6fae3ab"
-      },
-      "releasedAt": "2026-02-16"
-    }
-  ],
+  "releases": [{
+    "version": "0.1.0",
+    "compiler": {
+      "pond": 0,
+      "min-drop": 380
+    },
+    "source": {
+      "commit": "__COMMIT_SHA__",
+      "sha256": "__TARBALL_SHA256__"
+    },
+    "releasedAt": "2026-02-16"
+  }],
   "createdAt": "2026-02-16"
 }
