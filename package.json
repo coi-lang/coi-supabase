@@ -10,11 +10,11 @@
       "version": "0.1.0",
       "compiler": {
         "pond": 0,
-        "min-drop": 363
+        "min-drop": 380
       },
       "source": {
-        "commit": "a9f9a5b77006dbfbd30fe7227f87098b1e36250f",
-        "sha256": "d8c8427edbf17e607f0a178775ebdb4079f17e1943a9112d36282ad43aed27e9"
+        "commit": "1245bda159acf0d17b3ddf973bb2e7f37521a1b8",
+        "sha256": "f8c50a46faf7bca1ac59acf3020fbd5868375e66295602c90a7c5f3dff27129e"
       },
       "releasedAt": "2026-02-16"
     }
