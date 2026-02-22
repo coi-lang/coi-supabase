@@ -213,8 +213,8 @@ Credentials credentials
                         "schema":"${schema}",
                         "table":"${table}"
                     }],
-                    "broadcast":{__PROTECTED_1__:false},
-                    "presence":{__PROTECTED_1__:__PROTECTED_2__}
+                    "broadcast":{"ack":false},
+                    "presence":{"key":""}
                 }
             },
             "ref":"${nextRefString()}"
