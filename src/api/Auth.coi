@@ -51,6 +51,14 @@ pub component Auth(
     pub mut string userEmail = "";
     pub mut string lastError = "";
     pub mut string lastResponse = "";
+    mut def authSuccessHandler(string) : void = &handleNoopAuthSuccess;
+    mut def authErrorHandler(string) : void = &handleNoopAuthError;
+
+    def handleNoopAuthSuccess(string response) : void {
+    }
+
+    def handleNoopAuthError(string error) : void {
+    }
 
     pub def configure(string newSupabaseUrl, string newPublishableKey) : void {
         baseUrl = newSupabaseUrl;
@@ -70,6 +78,22 @@ pub component Auth(
 
     pub def setPublishableKey(string newPublishableKey) : void {
         apiKey = newPublishableKey;
+    }
+
+    pub def onSuccess(def handler(string) : void) : void {
+        authSuccessHandler = handler;
+    }
+
+    pub def onError(def handler(string) : void) : void {
+        authErrorHandler = handler;
+    }
+
+    pub def onAuthSuccess(def handler(string) : void) : void {
+        onSuccess(handler);
+    }
+
+    pub def onAuthError(def handler(string) : void) : void {
+        onError(handler);
     }
 
     def hasErrorPayload(string response) : bool {
@@ -124,10 +148,12 @@ pub component Auth(
         if (hasErrorPayload(response)) {
             lastError = response;
             authenticated = false;
+            authErrorHandler(response);
             System.error("Sign up returned error payload");
             return;
         }
         lastError = "";
+        authSuccessHandler(response);
         // Parse response and update state
         // Response contains: access_token, user.id, user.email
         System.log("Sign up successful");
@@ -138,6 +164,7 @@ pub component Auth(
         lastError = error;
         lastResponse = error;
         authenticated = false;
+        authErrorHandler(error);
         System.error("Sign up failed: ${error}");
     }
 
@@ -162,11 +189,13 @@ pub component Auth(
         if (hasErrorPayload(response)) {
             lastError = response;
             authenticated = false;
+            authErrorHandler(response);
             System.error("Sign in returned error payload");
             return;
         }
         authenticated = true;
         lastError = "";
+        authSuccessHandler(response);
         // Parse response for access_token, user data
         System.log("Sign in successful");
     }
@@ -176,6 +205,7 @@ pub component Auth(
         lastError = error;
         lastResponse = error;
         authenticated = false;
+        authErrorHandler(error);
         System.error("Sign in failed: ${error}");
     }
 
@@ -218,10 +248,12 @@ pub component Auth(
         lastResponse = response;
         if (hasErrorPayload(response)) {
             lastError = response;
+            authErrorHandler(response);
             System.error("Reset password returned error payload");
             return;
         }
         lastError = "";
+        authSuccessHandler(response);
         System.log("Password reset email sent");
     }
 
@@ -229,6 +261,7 @@ pub component Auth(
         loading = false;
         lastError = error;
         lastResponse = error;
+        authErrorHandler(error);
     }
 
     // Check if user has valid session

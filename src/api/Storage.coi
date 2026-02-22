@@ -24,6 +24,14 @@ pub component StorageClient(
     pub mut string lastError = "";
     pub mut string lastResponse = "";
     mut string currentBucket = "";
+    mut def storageSuccessHandler(string) : void = &handleNoopStorageSuccess;
+    mut def storageErrorHandler(string) : void = &handleNoopStorageError;
+
+    def handleNoopStorageSuccess(string response) : void {
+    }
+
+    def handleNoopStorageError(string error) : void {
+    }
 
     pub def configure(string newSupabaseUrl, string newPublishableKey) : void {
         baseUrl = newSupabaseUrl;
@@ -36,6 +44,22 @@ pub component StorageClient(
 
     pub def configureCredentials(Credentials credentials) : void {
         configure(credentials.url, credentials.publishableKey);
+    }
+
+    pub def onSuccess(def handler(string) : void) : void {
+        storageSuccessHandler = handler;
+    }
+
+    pub def onError(def handler(string) : void) : void {
+        storageErrorHandler = handler;
+    }
+
+    pub def onStorageSuccess(def handler(string) : void) : void {
+        onSuccess(handler);
+    }
+
+    pub def onStorageError(def handler(string) : void) : void {
+        onError(handler);
     }
 
     def hasErrorPayload(string response) : bool {
@@ -91,10 +115,12 @@ pub component StorageClient(
         lastResponse = response;
         if (hasErrorPayload(response)) {
             lastError = response;
+            storageErrorHandler(response);
             System.error("Download returned error payload");
             return;
         }
         lastError = "";
+        storageSuccessHandler(response);
         System.log("Download successful");
     }
 
@@ -102,6 +128,7 @@ pub component StorageClient(
         loading = false;
         lastError = error;
         lastResponse = error;
+        storageErrorHandler(error);
         System.error("Download failed: ${error}");
     }
 
@@ -128,10 +155,12 @@ pub component StorageClient(
         lastResponse = response;
         if (hasErrorPayload(response)) {
             lastError = response;
+            storageErrorHandler(response);
             System.error("List returned error payload");
             return;
         }
         lastError = "";
+        storageSuccessHandler(response);
         System.log("List successful");
     }
 
@@ -139,6 +168,7 @@ pub component StorageClient(
         loading = false;
         lastError = error;
         lastResponse = error;
+        storageErrorHandler(error);
         System.error("List failed: ${error}");
     }
 
@@ -165,10 +195,12 @@ pub component StorageClient(
         lastResponse = response;
         if (hasErrorPayload(response)) {
             lastError = response;
+            storageErrorHandler(response);
             System.error("Remove returned error payload");
             return;
         }
         lastError = "";
+        storageSuccessHandler(response);
         System.log("Remove successful");
     }
 
@@ -176,6 +208,7 @@ pub component StorageClient(
         loading = false;
         lastError = error;
         lastResponse = error;
+        storageErrorHandler(error);
         System.error("Remove failed: ${error}");
     }
 
@@ -203,10 +236,12 @@ pub component StorageClient(
         lastResponse = response;
         if (hasErrorPayload(response)) {
             lastError = response;
+            storageErrorHandler(response);
             System.error("Signed URL returned error payload");
             return;
         }
         lastError = "";
+        storageSuccessHandler(response);
         System.log("Signed URL created");
     }
 
@@ -214,6 +249,7 @@ pub component StorageClient(
         loading = false;
         lastError = error;
         lastResponse = error;
+        storageErrorHandler(error);
         System.error("Signed URL creation failed: ${error}");
     }
 }

@@ -34,6 +34,14 @@ pub component Database(
     pub mut string lastResponse = "";
     mut string currentTable = "";
     mut string queryParams = "";
+    mut def selectSuccessHandler(string) : void = &handleNoopSelectSuccess;
+    mut def selectErrorHandler(string) : void = &handleNoopSelectError;
+
+    def handleNoopSelectSuccess(string response) : void {
+    }
+
+    def handleNoopSelectError(string error) : void {
+    }
 
     pub def configure(string newSupabaseUrl, string newPublishableKey) : void {
         baseUrl = newSupabaseUrl;
@@ -51,6 +59,22 @@ pub component Database(
 
     pub def resetQuery() : void {
         queryParams = "";
+    }
+
+    pub def onSuccess(def handler(string) : void) : void {
+        selectSuccessHandler = handler;
+    }
+
+    pub def onError(def handler(string) : void) : void {
+        selectErrorHandler = handler;
+    }
+
+    pub def onSelectSuccess(def handler(string) : void) : void {
+        onSuccess(handler);
+    }
+
+    pub def onSelectError(def handler(string) : void) : void {
+        onError(handler);
     }
 
     def hasErrorPayload(string response) : bool {
@@ -89,7 +113,7 @@ pub component Database(
         lastResponse = "";
 
         string url = "${baseUrl}/rest/v1/${currentTable}?select=${columns}${queryParams}";
-        FetchRequest.get(url, requestHeaders(), &onSelectSuccess, &onSelectError);
+        FetchRequest.get(url, requestHeaders(), &handleSelectResponse, &handleSelectRequestError);
     }
 
     pub def selectFrom(string table, string columns, int count) : void {
@@ -100,22 +124,25 @@ pub component Database(
         select(columns);
     }
 
-    def onSelectSuccess(string response) : void {
+    def handleSelectResponse(string response) : void {
         loading = false;
         lastResponse = response;
         if (hasErrorPayload(response)) {
             lastError = response;
+            selectErrorHandler(response);
             System.error("Select returned error payload");
             return;
         }
         lastError = "";
+        selectSuccessHandler(response);
         System.log("Select successful");
     }
 
-    def onSelectError(string error) : void {
+    def handleSelectRequestError(string error) : void {
         loading = false;
         lastError = error;
         lastResponse = error;
+        selectErrorHandler(error);
         System.error("Select failed: ${error}");
     }
 
