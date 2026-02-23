@@ -73,6 +73,10 @@ mut Supabase::Auth auth = Supabase::Auth(creds);
 
 Main methods:
 
+- `onSuccess(handler)`
+- `onError(handler)`
+- `onAuthSuccess(handler)`
+- `onAuthError(handler)`
 - `signUp(email, password)`
 - `signIn(email, password)`
 - `signInWithOAuth(provider, redirectTo)`
@@ -98,6 +102,17 @@ State fields you can read:
 Example:
 
 ```coi
+def handleAuthSuccess(string response) : void {
+	System.log(response);
+}
+
+def handleAuthError(string error) : void {
+	System.error(error);
+}
+
+auth.onSuccess(&handleAuthSuccess);
+auth.onError(&handleAuthError);
+
 auth.signIn("email@example.com", "password");
 
 if (!auth.lastError.isEmpty()) {
@@ -130,6 +145,17 @@ if (!db.lastError.isEmpty()) {
 Builder style (when you need multiple filters/modifiers):
 
 ```coi
+def handleDbSuccess(string response) : void {
+	System.log(response);
+}
+
+def handleDbError(string error) : void {
+	System.error(error);
+}
+
+db.onSuccess(&handleDbSuccess);
+db.onError(&handleDbError);
+
 db.from("users");
 db.limit(1);
 db.select("*");
@@ -143,6 +169,10 @@ if (!db.lastError.isEmpty()) {
 
 ### Query methods
 
+- `onSuccess(handler)`
+- `onError(handler)`
+- `onSelectSuccess(handler)`
+- `onSelectError(handler)`
 - `from(table)`
 - `select(columns)`
 - `selectFrom(table, columns, count)`
@@ -186,6 +216,10 @@ mut Supabase::StorageClient storage = Supabase::StorageClient(creds);
 
 Main methods:
 
+- `onSuccess(handler)`
+- `onError(handler)`
+- `onStorageSuccess(handler)`
+- `onStorageError(handler)`
 - `from(bucket)`
 - `getPublicUrl(path) : string`
 - `publicUrl(bucket, path) : string`
@@ -208,6 +242,17 @@ State fields:
 Example:
 
 ```coi
+def handleStorageSuccess(string response) : void {
+	System.log(response);
+}
+
+def handleStorageError(string error) : void {
+	System.error(error);
+}
+
+storage.onSuccess(&handleStorageSuccess);
+storage.onError(&handleStorageError);
+
 storage.from("avatars");
 string publicUrl = storage.getPublicUrl("user-123.png");
 System.log(publicUrl);
@@ -233,6 +278,8 @@ Main methods:
 - `onError(handler)`
 - `configure(url, publishableKey)`
 - `configureCredentials(credentials)`
+
+Note: Realtime uses `onEvent` + `onError` (no `onSuccess` callback).
 
 State fields:
 
@@ -303,7 +350,18 @@ component AuthDemo {
 	);
 	mut Supabase::Auth auth = Supabase::Auth(creds);
 
+	def handleAuthSuccess(string response) : void {
+		System.log(response);
+	}
+
+	def handleAuthError(string error) : void {
+		System.error(error);
+	}
+
 	def run() : void {
+		auth.onSuccess(&handleAuthSuccess);
+		auth.onError(&handleAuthError);
+
 		auth.signUp("new-user@example.com", "password123");
 		auth.signIn("new-user@example.com", "password123");
 
@@ -338,7 +396,18 @@ component DatabaseDemo {
 	);
 	mut Supabase::Database db = Supabase::Database(creds);
 
+	def handleDbSuccess(string response) : void {
+		System.log(response);
+	}
+
+	def handleDbError(string error) : void {
+		System.error(error);
+	}
+
 	def run() : void {
+		db.onSuccess(&handleDbSuccess);
+		db.onError(&handleDbError);
+
 		// Simple one-liner query
 		db.selectFrom("users", "id,name,email", 10);
 
@@ -378,7 +447,18 @@ component StorageDemo {
 	);
 	mut Supabase::StorageClient storage = Supabase::StorageClient(creds);
 
+	def handleStorageSuccess(string response) : void {
+		System.log(response);
+	}
+
+	def handleStorageError(string error) : void {
+		System.error(error);
+	}
+
 	def run() : void {
+		storage.onSuccess(&handleStorageSuccess);
+		storage.onError(&handleStorageError);
+
 		storage.from("avatars");
 
 		string url = storage.getPublicUrl("users/user-1.png");
