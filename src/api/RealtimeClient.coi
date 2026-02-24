@@ -10,12 +10,12 @@ import "Credentials.coi";
 //
 // Usage:
 //   Credentials credentials = Credentials("https://xxx.supabase.co", "publishable-key");
-//   mut Realtime realtime = Realtime(credentials);
+//   mut RealtimeClient realtime = RealtimeClient(credentials);
 //   realtime.onEvent(&handleRealtimeEvent);
 //   realtime.onError(&handleRealtimeError);
 //   realtime.subscribeToTable("public", "messages", "*");
 
-pub component Realtime(
+pub component RealtimeClient(
 Credentials credentials
 ) {
     mut string baseUrl = credentials.url;

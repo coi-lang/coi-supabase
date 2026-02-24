@@ -13,10 +13,10 @@ Client package for [Supabase](https://supabase.com/) in [Coi](https://github.com
 This package gives you:
 
 - `Supabase::Credentials` for shared project configuration
-- `Supabase::Auth` for sign-in, sign-up, OAuth, and password reset
-- `Supabase::Database` for fluent PostgREST queries
+- `Supabase::AuthClient` for sign-in, sign-up, OAuth, and password reset
+- `Supabase::DatabaseClient` for fluent PostgREST queries
 - `Supabase::StorageClient` for storage URLs, listing, downloads, remove, and signed URLs
-- `Supabase::Realtime` for live Postgres change subscriptions over WebSocket
+- `Supabase::RealtimeClient` for live Postgres change subscriptions over WebSocket
 
 ## Install
 
@@ -44,10 +44,10 @@ mut Supabase::Credentials creds = Supabase::Credentials(
 	"your-publishable-key"
 );
 
-mut Supabase::Auth auth = Supabase::Auth(creds);
-mut Supabase::Database db = Supabase::Database(creds);
+mut Supabase::AuthClient auth = Supabase::AuthClient(creds);
+mut Supabase::DatabaseClient db = Supabase::DatabaseClient(creds);
 mut Supabase::StorageClient storage = Supabase::StorageClient(creds);
-mut Supabase::Realtime realtime = Supabase::Realtime(creds);
+mut Supabase::RealtimeClient realtime = Supabase::RealtimeClient(creds);
 ```
 
 ## Core Types
@@ -68,7 +68,7 @@ Use one credentials object and pass it to all clients.
 Create a client:
 
 ```coi
-mut Supabase::Auth auth = Supabase::Auth(creds);
+mut Supabase::AuthClient auth = Supabase::AuthClient(creds);
 ```
 
 Main methods:
@@ -125,7 +125,7 @@ if (!auth.lastError.isEmpty()) {
 Create a client:
 
 ```coi
-mut Supabase::Database db = Supabase::Database(creds);
+mut Supabase::DatabaseClient db = Supabase::DatabaseClient(creds);
 ```
 
 ### Typical query flow
@@ -263,7 +263,7 @@ System.log(publicUrl);
 Create a client:
 
 ```coi
-mut Supabase::Realtime realtime = Supabase::Realtime(creds);
+mut Supabase::RealtimeClient realtime = Supabase::RealtimeClient(creds);
 ```
 
 Main methods:
@@ -330,10 +330,10 @@ mut Supabase::Credentials creds = Supabase::Credentials(
 	"your-publishable-key"
 );
 
-mut Supabase::Auth auth = Supabase::Auth(creds);
-mut Supabase::Database db = Supabase::Database(creds);
+mut Supabase::AuthClient auth = Supabase::AuthClient(creds);
+mut Supabase::DatabaseClient db = Supabase::DatabaseClient(creds);
 mut Supabase::StorageClient storage = Supabase::StorageClient(creds);
-mut Supabase::Realtime realtime = Supabase::Realtime(creds);
+mut Supabase::RealtimeClient realtime = Supabase::RealtimeClient(creds);
 ```
 
 ### 2) Auth (sign up, sign in, oauth, reset, sign out)
@@ -348,7 +348,7 @@ component AuthDemo {
 		"https://your-project.supabase.co",
 		"your-publishable-key"
 	);
-	mut Supabase::Auth auth = Supabase::Auth(creds);
+	mut Supabase::AuthClient auth = Supabase::AuthClient(creds);
 
 	def handleAuthSuccess(string response) : void {
 		System.log(response);
@@ -394,7 +394,7 @@ component DatabaseDemo {
 		"https://your-project.supabase.co",
 		"your-publishable-key"
 	);
-	mut Supabase::Database db = Supabase::Database(creds);
+	mut Supabase::DatabaseClient db = Supabase::DatabaseClient(creds);
 
 	def handleDbSuccess(string response) : void {
 		System.log(response);
@@ -494,7 +494,7 @@ component RealtimeDemo {
 		"https://your-project.supabase.co",
 		"your-publishable-key"
 	);
-	mut Supabase::Realtime realtime = Supabase::Realtime(creds);
+	mut Supabase::RealtimeClient realtime = Supabase::RealtimeClient(creds);
 
 	def handleRealtimeEvent(string payload) : void {
 		System.log(payload);

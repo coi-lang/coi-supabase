@@ -9,11 +9,11 @@
 //   Supabase::Credentials credentials = Supabase::Credentials(SUPABASE_URL, SUPABASE_KEY);
 //
 //   // Database queries
-//   mut Supabase::Database db = Supabase::Database(credentials);
+//   mut Supabase::DatabaseClient db = Supabase::DatabaseClient(credentials);
 //   db.selectFrom("users", "*", 10);
 //
 //   // Authentication
-//   mut Supabase::Auth auth = Supabase::Auth(credentials);
+//   mut Supabase::AuthClient auth = Supabase::AuthClient(credentials);
 //   auth.signIn("email@example.com", "password");
 //
 //   // Storage
@@ -24,7 +24,7 @@ module Supabase;
 
 // API modules
 pub import "src/api/Credentials.coi";
-pub import "src/api/Auth.coi";
-pub import "src/api/Database.coi";
-pub import "src/api/Storage.coi";
-pub import "src/api/Realtime.coi";
+pub import "src/api/AuthClient.coi";
+pub import "src/api/DatabaseClient.coi";
+pub import "src/api/StorageClient.coi";
+pub import "src/api/RealtimeClient.coi";

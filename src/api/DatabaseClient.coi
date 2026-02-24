@@ -10,7 +10,7 @@ import "Credentials.coi";
 //
 // Usage:
 //   Credentials credentials = Credentials("https://xxx.supabase.co", "publishable-key");
-//   mut Database db = Database(credentials);
+//   mut DatabaseClient db = DatabaseClient(credentials);
 //   db.from("users");
 //   db.eq("id", "123");
 //   db.select("*", &onData, &onError);
@@ -23,7 +23,7 @@ pub pod QueryResponse {
     int count;
 }
 
-pub component Database(
+pub component DatabaseClient(
     Credentials credentials
 ) {
     mut string baseUrl = credentials.url;

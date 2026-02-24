@@ -9,7 +9,7 @@ import "Credentials.coi";
 //
 // Usage:
 //   Credentials credentials = Credentials("https://xxx.supabase.co", "publishable-key");
-//   mut Auth auth = Auth(credentials);
+//   mut AuthClient auth = AuthClient(credentials);
 //   auth.signUp("email@example.com", "password", &onSuccess, &onError);
 //   auth.signIn("email@example.com", "password", &onSuccess, &onError);
 
@@ -38,7 +38,7 @@ pub pod AuthResponse {
     string error;
 }
 
-pub component Auth(
+pub component AuthClient(
     Credentials credentials
 ) {
     mut string baseUrl = credentials.url;
